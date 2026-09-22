@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lana's Pages</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --border: #e3e6eb;
+    --text: #1c2128;
+    --text-dim: #5b6472;
+    --accent: #3457d5;
+    --accent-soft: #ebf0ff;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1216;
+      --surface: #171b21;
+      --border: #262c35;
+      --text: #e7e9ec;
+      --text-dim: #9aa3b1;
+      --accent: #7c9bff;
+      --accent-soft: #1b2338;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 56px 20px 80px;
+  }
+  header {
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  h1 {
+    margin: 0 0 10px;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+  }
+  .sub {
+    color: var(--text-dim);
+    font-size: 15.5px;
+    line-height: 1.55;
+    max-width: 60ch;
+    margin: 0;
+  }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 36px 0 18px;
+  }
+  .toolbar h2 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 0;
+  }
+  .count {
+    font-size: 13px;
+    color: var(--text-dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+  .card-tag {
+    align-self: flex-start;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 3px 9px;
+    border-radius: 6px;
+  }
+  .card-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+  }
+  .card-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    margin: 0;
+    flex-grow: 1;
+  }
+  .card-meta {
+    font-size: 12.5px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .placeholder {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 26px 20px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .placeholder strong {
+    color: var(--text);
+    display: block;
+    font-size: 14.5px;
+    margin-bottom: 4px;
+  }
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">Lana's Pages</div>
+      <h1>A place for everything I've organized</h1>
+      <p class="sub">
+        One link for every page I build to organize notes, plans, and information.
+        New pages get added here as they're made — just open this link any time to see the full set.
+      </p>
+    </header>
+
+    <div class="toolbar">
+      <h2>All Pages</h2>
+      <span class="count">1 page</span>
+    </div>
+
+    <div class="grid">
+      <a class="card" href="sample.html">
+        <span class="card-tag">Sample</span>
+        <h3 class="card-title">Reading List Tracker</h3>
+        <p class="card-desc">
+          An example page showing what an organizer page looks like here — track books by status,
+          filter by category, and see progress at a glance.
+        </p>
+        <div class="card-meta">Added Sept 22, 2026 →</div>
+      </a>
+
+      <div class="placeholder">
+        <strong>More pages land here</strong>
+        Every new page gets its own card automatically the next time this index is updated.
+      </div>
+    </div>
+
+    <footer>
+      Hosted for free on GitHub Pages · <a href="https://github.com/diego-1912/my-pages" target="_blank" rel="noopener">view source repository</a>
+    </footer>
+  </div>
+</body>
+</html>
