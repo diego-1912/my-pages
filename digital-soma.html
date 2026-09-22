@@ -1,0 +1,657 @@
+<title>Digital Soma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg: #0a0b10;
+    --bg-glow: #10131f;
+    --surface: #14161f;
+    --surface-2: #191c27;
+    --border: #262a38;
+    --border-soft: #1d202c;
+    --text: #e9eaf0;
+    --text-dim: #9498ac;
+    --text-faint: #666b81;
+    --accent: #6f97ff;
+    --accent-strong: #93b3ff;
+    --accent-soft: rgba(111,151,255,0.13);
+    --accent-line: rgba(111,151,255,0.28);
+    --alert: #ff8264;
+    --alert-soft: rgba(255,130,100,0.13);
+    --orwell: #9b93ab;
+    --orwell-soft: rgba(155,147,171,0.1);
+    --font-display: 'Newsreader', Georgia, 'Iowan Old Style', serif;
+    --font-body: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    padding-inline: 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection{ background: var(--accent-soft); color: var(--accent-strong); }
+
+  a{ color: var(--accent-strong); }
+
+  .wrap{ max-width: 760px; margin: 0 auto; }
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    position: relative;
+    padding-block: 48px 32px;
+    overflow: hidden;
+  }
+  .masthead::before{
+    content:"";
+    position:absolute;
+    top:-120px; left:50%; transform:translateX(-50%);
+    width:640px; height:340px;
+    background: radial-gradient(ellipse at center, var(--accent-soft) 0%, rgba(111,151,255,0) 70%);
+    pointer-events:none;
+    z-index:0;
+  }
+  .masthead::after{
+    content:"";
+    position:absolute; inset:0;
+    background-image: repeating-linear-gradient(180deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 3px);
+    pointer-events:none;
+    z-index:0;
+  }
+  .masthead > *{ position:relative; z-index:1; }
+
+  .kicker{
+    display:flex; align-items:center; gap:8px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    margin-bottom: 18px;
+  }
+  .kicker .dot{
+    width:7px; height:7px; border-radius:50%;
+    background: var(--alert);
+    box-shadow: 0 0 0 3px var(--alert-soft);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ .kicker .dot{ animation:none; } }
+  @keyframes pulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.35; }
+  }
+
+  h1.title{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.9rem, 5.4vw, 2.9rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0 0 18px;
+  }
+
+  .dek{
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.02rem, 2.4vw, 1.18rem);
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 60ch;
+    margin: 0 0 22px;
+  }
+
+  .meta-row{
+    display:flex; flex-wrap:wrap; align-items:center; gap: 10px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .meta-row span:not(:last-child)::after{
+    content:"·";
+    margin-left: 14px;
+    color: var(--border);
+  }
+
+  /* ---------- Tabs ---------- */
+  nav.tablist{
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    display:flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-block: 10px;
+    margin-bottom: 28px;
+    background: linear-gradient(var(--bg) 78%, transparent);
+    border-bottom: 1px solid var(--border-soft);
+  }
+  nav.tablist::-webkit-scrollbar{ display:none; }
+
+  .tab{
+    flex: 0 0 auto;
+    display:flex; align-items:center; gap:7px;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.02em;
+    color: var(--text-faint);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 8px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color .15s ease, background-color .15s ease, border-color .15s ease;
+  }
+  .tab svg{ width:14px; height:14px; flex:none; opacity:0.85; }
+  .tab:hover{ color: var(--text); }
+  .tab[aria-selected="true"]{
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-color: var(--accent-line);
+  }
+  .tab:focus-visible{ outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- Panels ---------- */
+  main{ padding-bottom: 64px; }
+  .panel{ display:flex; flex-direction:column; gap: 22px; }
+  .panel[hidden]{ display:none; }
+
+  .panel-head{ display:flex; align-items:flex-start; gap:14px; margin-bottom: -4px; }
+  .panel-head .icon-wrap{
+    flex:none;
+    width:38px; height:38px;
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+    color: var(--accent-strong);
+  }
+  .panel-head .icon-wrap svg{ width:19px; height:19px; }
+  h2.panel-title{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.36rem, 3.4vw, 1.7rem);
+    line-height: 1.22;
+    text-wrap: balance;
+    margin: 3px 0 0;
+  }
+
+  p.intro{
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    max-width: 64ch;
+    margin: 0;
+  }
+
+  h3.group-title{
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-faint);
+    margin: 10px 0 -6px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-soft);
+  }
+  h3.group-title:first-of-type{ border-top: none; padding-top:0; margin-top:0; }
+  p.group-intro{
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--text-dim);
+    max-width: 64ch;
+    margin: -4px 0 2px;
+  }
+
+  /* ---------- Accordion (details/summary), open by default ---------- */
+  .stack{ display:flex; flex-direction:column; gap:10px; }
+
+  details.term{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  details.term[open]{ border-color: var(--border); }
+  details.term summary{
+    list-style:none;
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    padding: 13px 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  details.term summary::-webkit-details-marker{ display:none; }
+  details.term summary:focus-visible{ outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 12px; }
+
+  .term-index{
+    flex:none;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-line);
+    width: 24px; height:24px;
+    border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .term-name{
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+    flex: 1;
+  }
+  .chev{
+    flex:none;
+    width:16px; height:16px;
+    color: var(--text-faint);
+    transition: transform .18s ease;
+    transform: rotate(180deg);
+  }
+  details.term:not([open]) .chev{ transform: rotate(0deg); }
+
+  .term-body{
+    padding: 0 16px 16px 54px;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+  .term-body p{ margin:0; }
+
+  /* ---------- Orwell / Huxley duel table ---------- */
+  .duel{
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .duel-heads{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .duel-heads div{
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 13px 16px;
+    text-align:center;
+  }
+  .duel-heads .h-orwell{ color: var(--orwell); background: var(--orwell-soft); border-right: 1px solid var(--border); }
+  .duel-heads .h-huxley{ color: var(--accent-strong); background: var(--accent-soft); }
+
+  .duel-row{ border-top: 1px solid var(--border-soft); }
+  .duel-row .feature{
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    padding: 12px 16px 4px;
+  }
+  .duel-cells{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .duel-cells div{
+    padding: 4px 16px 14px;
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+  .duel-cells .c-orwell{ color: var(--text-dim); border-right: 1px solid var(--border-soft); }
+  .duel-cells .c-huxley{ color: var(--text); }
+
+  @media (max-width: 520px){
+    .duel-heads div{ font-size: 0.64rem; padding: 11px 8px; }
+    .duel-cells div{ padding: 4px 10px 14px; font-size: 0.86rem; }
+    .duel-row .feature{ padding-left: 10px; }
+  }
+
+  /* ---------- Closing callout ---------- */
+  .callout{
+    border-left: 2px solid var(--accent);
+    background: linear-gradient(90deg, var(--accent-soft), transparent 60%);
+    border-radius: 0 12px 12px 0;
+    padding: 18px 20px;
+  }
+  .callout p{
+    margin:0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top: 1px solid var(--border-soft);
+    padding-block: 20px 40px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="kicker"><span class="dot"></span> Briefing Document</div>
+    <h1 class="title">Analysis of Digital Dependency and the Erosion of Human Cognition</h1>
+    <p class="dek">This briefing document synthesizes a critical analysis of modern screen dependency, framing the current technological landscape through the prophetic warnings of Aldous Huxley.</p>
+    <div class="meta-row">
+      <span>Seven sections</span>
+      <span>Tap a card to collapse it</span>
+      <span>Read time ≈ 9 min</span>
+    </div>
+  </header>
+
+  <nav class="tablist" role="tablist" aria-label="Briefing sections">
+    <button class="tab" role="tab" data-tab="overview" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="7" x2="19" y2="7"/><line x1="5" y1="12" x2="16" y2="12"/><line x1="5" y1="17" x2="12" y2="17"/></svg>
+      Overview
+    </button>
+    <button class="tab" role="tab" data-tab="paradigm" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></svg>
+      Huxleyan Paradigm
+    </button>
+    <button class="tab" role="tab" data-tab="neuro" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+      Neurological Impact
+    </button>
+    <button class="tab" role="tab" data-tab="cognition" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>
+      Erosion of Cognition
+    </button>
+    <button class="tab" role="tab" data-tab="boredom" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A7.5 7.5 0 1 1 9.9 4.2a6 6 0 1 0 10.1 10.3z"/></svg>
+      Death of Boredom
+    </button>
+    <button class="tab" role="tab" data-tab="economy" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.8" fill="currentColor" stroke="none"/></svg>
+      Attention Economy
+    </button>
+    <button class="tab" role="tab" data-tab="reclamation" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M15 9l-2 6-6 2 2-6z"/></svg>
+      Reclamation
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- OVERVIEW -->
+    <section class="panel" id="panel-overview" role="tabpanel">
+      <p class="intro">The core thesis posits that society has transitioned into a "Huxleyan" dystopia where control is exerted not through state-mandated pain or prohibition, but through the systematic exploitation of pleasure and distraction.</p>
+
+      <h3 class="group-title">Key takeaways</h3>
+      <div class="stack">
+        <details class="term" open>
+          <summary><span class="term-index">01</span><span class="term-name">Neurological Hijacking</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Tech companies employ specialists to exploit the brain's reward circuits, specifically targeting the dopamine pathways of developing minds (under age 25).</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">02</span><span class="term-name">The Death of Deep Cognition</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>The shift from "deep reading" to "scanning" has fragmented human attention, rendering individuals incapable of processing complex arguments, which poses a direct threat to democratic stability.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">03</span><span class="term-name">The "Soma" of the 21st Century</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Screens act as a digital narcotic, burying meaningful truth under a "mountain of garbage" and eliminating the constructive boredom necessary for creativity and identity formation.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">04</span><span class="term-name">Industry Hypocrisy</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Creators of these technologies often shield their own children from screen exposure, acknowledging the inherent dangers of the products they market to the general public.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">05</span><span class="term-name">Digital Sovereignty</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Recovery requires a conscious "rebellion" involving digital fasting, the restoration of physical-world experiences, and the reclamation of attention as a finite, precious resource.</p></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- HUXLEYAN PARADIGM -->
+    <section class="panel" id="panel-paradigm" role="tabpanel" hidden>
+      <div class="panel-head">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></svg></div>
+        <h2 class="panel-title">The Huxleyan Paradigm: Control Through Pleasure</h2>
+      </div>
+      <p class="intro">The document highlights a fundamental shift in the nature of societal control, contrasting the dystopian visions of George Orwell and Aldous Huxley.</p>
+
+      <div class="duel">
+        <div class="duel-heads">
+          <div class="h-orwell">Orwellian Vision (1984)</div>
+          <div class="h-huxley">Huxleyan Vision (Brave New World)</div>
+        </div>
+        <div class="duel-row">
+          <div class="feature">Method of Control</div>
+          <div class="duel-cells">
+            <div class="c-orwell">Pain, fear, and prohibition.</div>
+            <div class="c-huxley">Pleasure, distraction, and satiation.</div>
+          </div>
+        </div>
+        <div class="duel-row">
+          <div class="feature">Mechanism</div>
+          <div class="duel-cells">
+            <div class="c-orwell">A government banning books.</div>
+            <div class="c-huxley">A society so distracted it no longer wants to read.</div>
+          </div>
+        </div>
+        <div class="duel-row">
+          <div class="feature">Result</div>
+          <div class="duel-cells">
+            <div class="c-orwell">Truth is concealed by the state.</div>
+            <div class="c-huxley">Truth is drowned in a sea of irrelevance.</div>
+          </div>
+        </div>
+        <div class="duel-row">
+          <div class="feature">Modern Equivalent</div>
+          <div class="duel-cells">
+            <div class="c-orwell">Censorship and surveillance.</div>
+            <div class="c-huxley">"Soma" (reimagined as the smartphone).</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="intro">The source argues that we have arrived at the Huxleyan stage, where the "Soma" is no longer a pill but a "blue-glowing glass plate" used from waking until sleep. This constant stimulation buries any truth that matters under a mountain of insignificant data.</p>
+    </section>
+
+    <!-- NEUROLOGICAL IMPACT -->
+    <section class="panel" id="panel-neuro" role="tabpanel" hidden>
+      <div class="panel-head">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></div>
+        <h2 class="panel-title">The Neurological Impact of Screen Exposure</h2>
+      </div>
+      <p class="intro">The human brain, which continues to mature until approximately age 25, is currently being treated as a "guinea pig" for high-frequency digital stimulation.</p>
+
+      <h3 class="group-title">1. Exploitation of Reward Circuits</h3>
+      <p class="group-intro">Technology platforms are designed by "armies of specialists" with the goal of "hijacking" ancient biological mechanisms.</p>
+      <div class="stack">
+        <details class="term" open>
+          <summary><span class="term-index">01</span><span class="term-name">Dopamine Loops</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Every notification, "like," or new video triggers a dopamine release.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">02</span><span class="term-name">Threshold Elevation</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Continuous bombardment raises the level of stimulation required for a person to feel satisfied.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">03</span><span class="term-name">Real-World Friction</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Because reality is "slow and demanding" and does not provide a reward every three seconds, it becomes "insupportable" to the digitalized brain.</p></div>
+        </details>
+      </div>
+
+      <h3 class="group-title">2. Fragmentation of the Prefrontal Cortex</h3>
+      <p class="group-intro">The prefrontal cortex—responsible for focus, planning, and impulse control—is compromised by problematic screen use.</p>
+      <div class="stack">
+        <details class="term" open>
+          <summary><span class="term-index">01</span><span class="term-name">Chemical Alterations</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Studies of adolescents with problematic cell phone use show chemical alterations similar to those found in anxiety disorders.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">02</span><span class="term-name">Attention Span</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>The brain is being trained to "surrender" interest if there is no change in scene, sound, or stimulus every few seconds.</p></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- EROSION OF COGNITION -->
+    <section class="panel" id="panel-cognition" role="tabpanel" hidden>
+      <div class="panel-head">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg></div>
+        <h2 class="panel-title">The Erosion of Intellectual and Democratic Capacity</h2>
+      </div>
+      <p class="intro">The transition from physical text to digital scanning has profound implications for the ability of a population to govern itself.</p>
+
+      <div class="stack">
+        <details class="term" open>
+          <summary><span class="term-index">01</span><span class="term-name">The Death of Deep Reading</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Deep reading requires following complex ideas for hours. The screen-trained brain "scans" and "hunts for keywords" rather than processing nuance.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">02</span><span class="term-name">Illiteracy of Complexity</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>There is a growing population that recognizes letters but cannot comprehend a complex poem, a philosophical argument, or a legal contract.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">03</span><span class="term-name">Vulnerability to Manipulation</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Democratic survival depends on the ability to follow a reasoning to its conclusion. When arguments are replaced by 15-second slogans and "phrases of effect," the public becomes easy prey for "simple lies."</p></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- DEATH OF BOREDOM -->
+    <section class="panel" id="panel-boredom" role="tabpanel" hidden>
+      <div class="panel-head">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A7.5 7.5 0 1 1 9.9 4.2a6 6 0 1 0 10.1 10.3z"/></svg></div>
+        <h2 class="panel-title">The Death of Boredom and Creativity</h2>
+      </div>
+      <p class="intro">The source posits that "boredom" is not a negative state but a vital biological necessity.</p>
+
+      <div class="stack">
+        <details class="term" open>
+          <summary><span class="term-index">01</span><span class="term-name">The "Default Mode" Network</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Only when the brain stops receiving external stimuli does it begin to connect experiences and generate creativity. This "state of calm" is where identity is formed.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">02</span><span class="term-name">The Illusion of Connection</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Despite being the most "connected" generation in history, there is a marked increase in loneliness, anxiety, depression, and body dysmorphia.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">03</span><span class="term-name">Passive Consumption</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Constant stimulation prevents the "seed of imagination" from growing, leaving individuals feeling empty without a device.</p></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ATTENTION ECONOMY -->
+    <section class="panel" id="panel-economy" role="tabpanel" hidden>
+      <div class="panel-head">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.8" fill="currentColor" stroke="none"/></svg></div>
+        <h2 class="panel-title">The Attention Economy and Elite Hypocrisy</h2>
+      </div>
+      <p class="intro">The document exposes the predatory nature of the "Attention Economy" and the cognitive dissonance of its creators.</p>
+
+      <div class="stack">
+        <details class="term" open>
+          <summary><span class="term-index">01</span><span class="term-name">Human as Product</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Users are no longer protagonists of their own stories but "producers of free content" for companies that sell their attention to the highest bidder.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">02</span><span class="term-name">The Silicon Valley Paradox</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>It is noted that the designers of these applications often prohibit their own children from using screens, sometimes until age 14, and send them to schools without technology. They recognize the "weaponized" nature of the tool they sell to others.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">03</span><span class="term-name">Adult Complicity</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>The problem is not limited to youth; adults have "constructed this prison" and are often unable to endure a meal or a conversation without checking notifications, demonstrating a "reprogrammed" brain.</p></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- RECLAMATION -->
+    <section class="panel" id="panel-reclamation" role="tabpanel" hidden>
+      <div class="panel-head">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M15 9l-2 6-6 2 2-6z"/></svg></div>
+        <h2 class="panel-title">Strategies for Reclamation: Digital Sovereignty</h2>
+      </div>
+      <p class="intro">To escape the "digital cage," the source outlines several essential practices for regaining control over one's life and mind.</p>
+
+      <div class="stack">
+        <details class="term" open>
+          <summary><span class="term-index">01</span><span class="term-name">Admitting Dependency</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>The first step is acknowledging that if one cannot walk for an hour or wait in a line without a phone, they are dependent.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">02</span><span class="term-name">Digital Fasting and Sacred Zones</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Establishing "no-tech" areas, such as the dining table and the bedroom, to protect sleep and human connection.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">03</span><span class="term-name">Physical Engagement</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Prioritizing activities with "delayed rewards," such as reading physical books, manual labor, gardening, or physical exercise.</p></div>
+        </details>
+        <details class="term" open>
+          <summary><span class="term-index">04</span><span class="term-name">Attention as a Resource</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="term-body"><p>Recognizing that attention is "literally your life." Every second given to an algorithm is a second that never returns.</p></div>
+        </details>
+      </div>
+
+      <div class="callout">
+        <p>The document concludes that reclaiming focus is the "most powerful act of rebellion" in the modern age. By disconnecting from the "dark mirror" of the screen, individuals can return to inhabiting reality—the only place where genuine memories and bonds are created.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Briefing synthesis · digital dependency &amp; attention</span>
+    <span>Framed after Huxley, Brave New World</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var panels = {};
+  tabs.forEach(function(t){
+    var id = t.getAttribute('data-tab');
+    panels[id] = document.getElementById('panel-' + id);
+  });
+
+  function activate(id, focus){
+    tabs.forEach(function(t){
+      var isMatch = t.getAttribute('data-tab') === id;
+      t.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+      if (panels[t.getAttribute('data-tab')]) panels[t.getAttribute('data-tab')].hidden = !isMatch;
+      if (isMatch && focus) t.focus();
+    });
+    try { localStorage.setItem('digital-soma-tab', id); } catch(e){}
+  }
+
+  tabs.forEach(function(t, i){
+    t.addEventListener('click', function(){ activate(t.getAttribute('data-tab'), false); });
+    t.addEventListener('keydown', function(e){
+      var dir = 0;
+      if (e.key === 'ArrowRight') dir = 1;
+      else if (e.key === 'ArrowLeft') dir = -1;
+      else return;
+      e.preventDefault();
+      var next = (i + dir + tabs.length) % tabs.length;
+      activate(tabs[next].getAttribute('data-tab'), true);
+    });
+  });
+
+  var saved = null;
+  try { saved = localStorage.getItem('digital-soma-tab'); } catch(e){}
+  if (saved && panels[saved]) activate(saved, false);
+})();
+</script>
