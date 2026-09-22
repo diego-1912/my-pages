@@ -13,6 +13,7 @@
     --text-dim: #5b6472;
     --accent: #3457d5;
     --accent-soft: #ebf0ff;
+    --danger: #b3261e;
     --radius: 14px;
     --shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
   }
@@ -25,6 +26,7 @@
       --text-dim: #9aa3b1;
       --accent: #7c9bff;
       --accent-soft: #1b2338;
+      --danger: #ff8a80;
       --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.35);
     }
   }
@@ -154,6 +156,37 @@
     font-size: 14.5px;
     margin-bottom: 4px;
   }
+  .skeleton {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    height: 118px;
+    position: relative;
+    overflow: hidden;
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(120,130,150,0.08), transparent);
+    animation: shimmer 1.3s infinite;
+  }
+  @keyframes shimmer {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+  }
+  .error-box {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .error-box strong { color: var(--danger); }
+  .error-box a { color: var(--accent); }
   footer {
     margin-top: 56px;
     padding-top: 20px;
@@ -172,31 +205,138 @@
       <h1>A place for everything I've organized</h1>
       <p class="sub">
         One link for every page I build to organize notes, plans, and information.
-        New pages get added here as they're made — just open this link any time to see the full set.
+        This list updates itself straight from the repository — add a page there and it shows up here.
       </p>
     </header>
 
     <div class="toolbar">
       <h2>All Pages</h2>
-      <span class="count">1 page</span>
+      <span class="count" id="countBadge">…</span>
     </div>
 
-    <div class="grid">
-      <a class="card" href="sample.html">
-        <span class="card-tag">Sample</span>
-        <h3 class="card-title">Reading List Tracker</h3>
-        <p class="card-desc">
-          An example page showing what an organizer page looks like here — track books by status,
-          filter by category, and see progress at a glance.
-        </p>
-        <div class="card-meta">Added Sept 22, 2026 →</div>
-      </a>
-
-      <div class="placeholder">
-        <strong>More pages land here</strong>
-        Every new page gets its own card automatically the next time this index is updated.
-      </div>
+    <div class="grid" id="grid">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
     </div>
+
+<script>
+(function () {
+  var OWNER = "diego-1912";
+  var REPO = "my-pages";
+  var BRANCH = "main";
+  var API_LIST = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/?ref=" + BRANCH;
+  var RAW_BASE = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + BRANCH + "/";
+
+  var grid = document.getElementById("grid");
+  var countBadge = document.getElementById("countBadge");
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.textContent = str == null ? "" : String(str);
+    return div.innerHTML;
+  }
+
+  function prettifyFilename(name) {
+    var base = name.replace(/\.html?$/i, "");
+    base = base.replace(/[-_]+/g, " ").trim();
+    return base.replace(/\w\S*/g, function (w) {
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    });
+  }
+
+  function formatDate(iso) {
+    if (!iso) return "";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  }
+
+  // Reads an optional <script type="application/json" id="page-meta"> block from a page's HTML.
+  // Pages without one still get a card, built from their <title> and filename.
+  function extractMeta(html, fallbackFile) {
+    var meta = {
+      title: prettifyFilename(fallbackFile),
+      tag: "Page",
+      description: "",
+      date: ""
+    };
+    var titleMatch = html.match(/<title>([^<]*)<\/title>/i);
+    if (titleMatch && titleMatch[1].trim()) meta.title = titleMatch[1].trim();
+
+    var metaMatch = html.match(/<script[^>]*id=["']page-meta["'][^>]*>([\s\S]*?)<\/script>/i);
+    if (metaMatch) {
+      try {
+        var parsed = JSON.parse(metaMatch[1]);
+        if (parsed.title) meta.title = parsed.title;
+        if (parsed.tag) meta.tag = parsed.tag;
+        if (parsed.description) meta.description = parsed.description;
+        if (parsed.date) meta.date = parsed.date;
+      } catch (e) { /* malformed metadata: fall back silently */ }
+    }
+    return meta;
+  }
+
+  function cardHtml(file, meta) {
+    var metaLine = meta.date ? formatDate(meta.date) + " →" : "Open →";
+    return (
+      '<a class="card" href="' + encodeURIComponent(file) + '">' +
+      '<span class="card-tag">' + escapeHtml(meta.tag) + "</span>" +
+      '<h3 class="card-title">' + escapeHtml(meta.title) + "</h3>" +
+      (meta.description ? '<p class="card-desc">' + escapeHtml(meta.description) + "</p>" : '<p class="card-desc"></p>') +
+      '<div class="card-meta">' + escapeHtml(metaLine) + "</div>" +
+      "</a>"
+    );
+  }
+
+  function renderError(message) {
+    grid.innerHTML =
+      '<div class="error-box"><strong>Couldn\'t load the page list.</strong><br>' +
+      escapeHtml(message) +
+      ' You can still browse the files directly on <a href="https://github.com/' + OWNER + "/" + REPO + '" target="_blank" rel="noopener">GitHub</a>.</div>';
+    countBadge.textContent = "—";
+  }
+
+  function renderEmpty() {
+    grid.innerHTML =
+      '<div class="placeholder"><strong>No pages yet</strong>Add an .html file to the repository and it will appear here automatically.</div>';
+    countBadge.textContent = "0 pages";
+  }
+
+  fetch(API_LIST, { headers: { Accept: "application/vnd.github+json" } })
+    .then(function (res) {
+      if (!res.ok) throw new Error(res.status === 403 ? "GitHub's request limit was hit — try refreshing in a bit." : "GitHub returned an error (" + res.status + ").");
+      return res.json();
+    })
+    .then(function (entries) {
+      var files = entries.filter(function (e) {
+        return e.type === "file" && /\.html?$/i.test(e.name) && e.name.toLowerCase() !== "index.html";
+      });
+
+      if (!files.length) { renderEmpty(); return; }
+
+      return Promise.all(
+        files.map(function (f) {
+          return fetch(RAW_BASE + f.name)
+            .then(function (r) { return r.ok ? r.text() : ""; })
+            .then(function (html) { return { file: f.name, meta: extractMeta(html, f.name) }; })
+            .catch(function () { return { file: f.name, meta: extractMeta("", f.name) }; });
+        })
+      ).then(function (pages) {
+        pages.sort(function (a, b) {
+          if (a.meta.date && b.meta.date) return b.meta.date.localeCompare(a.meta.date);
+          if (a.meta.date) return -1;
+          if (b.meta.date) return 1;
+          return a.meta.title.localeCompare(b.meta.title);
+        });
+        grid.innerHTML = pages.map(function (p) { return cardHtml(p.file, p.meta); }).join("");
+        countBadge.textContent = pages.length + (pages.length === 1 ? " page" : " pages");
+      });
+    })
+    .catch(function (err) {
+      renderError(err.message || "Something went wrong.");
+    });
+})();
+</script>
 
     <footer>
       Hosted for free on GitHub Pages · <a href="https://github.com/diego-1912/my-pages" target="_blank" rel="noopener">view source repository</a>
