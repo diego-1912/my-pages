@@ -30,6 +30,7 @@
       --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.35);
     }
   }
+  html { font-size: 100%; }
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -47,7 +48,7 @@
     margin-bottom: 40px;
   }
   .eyebrow {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -56,12 +57,12 @@
   }
   h1 {
     margin: 0 0 10px;
-    font-size: 32px;
+    font-size: 2rem;
     letter-spacing: -0.02em;
   }
   .sub {
     color: var(--text-dim);
-    font-size: 15.5px;
+    font-size: 0.96875rem;
     line-height: 1.55;
     max-width: 60ch;
     margin: 0;
@@ -74,7 +75,7 @@
     margin: 36px 0 18px;
   }
   .toolbar h2 {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -82,7 +83,7 @@
     margin: 0;
   }
   .count {
-    font-size: 13px;
+    font-size: 0.8125rem;
     color: var(--text-dim);
     background: var(--surface);
     border: 1px solid var(--border);
@@ -113,7 +114,7 @@
   }
   .card-tag {
     align-self: flex-start;
-    font-size: 11.5px;
+    font-size: 0.71875rem;
     font-weight: 600;
     letter-spacing: 0.03em;
     text-transform: uppercase;
@@ -123,19 +124,19 @@
     border-radius: 6px;
   }
   .card-title {
-    font-size: 17px;
+    font-size: 1.0625rem;
     font-weight: 600;
     margin: 0;
   }
   .card-desc {
-    font-size: 14px;
+    font-size: 0.875rem;
     color: var(--text-dim);
     line-height: 1.5;
     margin: 0;
     flex-grow: 1;
   }
   .card-meta {
-    font-size: 12.5px;
+    font-size: 0.78125rem;
     color: var(--text-dim);
     display: flex;
     align-items: center;
@@ -147,13 +148,13 @@
     padding: 26px 20px;
     text-align: center;
     color: var(--text-dim);
-    font-size: 13.5px;
+    font-size: 0.84375rem;
     line-height: 1.6;
   }
   .placeholder strong {
     color: var(--text);
     display: block;
-    font-size: 14.5px;
+    font-size: 0.90625rem;
     margin-bottom: 4px;
   }
   .skeleton {
@@ -181,7 +182,7 @@
     background: var(--surface);
     border-radius: var(--radius);
     padding: 18px 20px;
-    font-size: 13.5px;
+    font-size: 0.84375rem;
     color: var(--text-dim);
     line-height: 1.6;
   }
@@ -191,7 +192,7 @@
     margin-top: 56px;
     padding-top: 20px;
     border-top: 1px solid var(--border);
-    font-size: 12.5px;
+    font-size: 0.78125rem;
     color: var(--text-dim);
   }
   footer a { color: var(--accent); text-decoration: none; }
@@ -345,5 +346,6 @@
       Hosted for free on GitHub Pages · <a href="https://github.com/diego-1912/my-pages" target="_blank" rel="noopener">view source repository</a>
     </footer>
   </div>
+<script src="font-control.js" defer></script>
 </body>
 </html>
