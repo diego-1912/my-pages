@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading List Tracker</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --border: #e3e6eb;
+    --text: #1c2128;
+    --text-dim: #5b6472;
+    --accent: #3457d5;
+    --accent-soft: #ebf0ff;
+    --good: #1a7f4e;
+    --good-soft: #e6f6ee;
+    --warn: #a5680b;
+    --warn-soft: #fdf3e2;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1216;
+      --surface: #171b21;
+      --border: #262c35;
+      --text: #e7e9ec;
+      --text-dim: #9aa3b1;
+      --accent: #7c9bff;
+      --accent-soft: #1b2338;
+      --good: #3ecf8e;
+      --good-soft: #10261c;
+      --warn: #e0ab4d;
+      --warn-soft: #2c220f;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 48px 20px 80px; }
+  .back { font-size: 13px; color: var(--text-dim); text-decoration: none; }
+  .back:hover { color: var(--accent); }
+  header { margin: 18px 0 28px; }
+  .eyebrow {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px;
+  }
+  h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.02em; }
+  .sub { color: var(--text-dim); font-size: 15px; margin: 0; max-width: 56ch; line-height: 1.5; }
+
+  .progress-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; margin: 24px 0; box-shadow: var(--shadow);
+  }
+  .progress-row { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--text-dim); margin-bottom: 10px; }
+  .progress-row strong { color: var(--text); }
+  .bar { height: 8px; border-radius: 999px; background: var(--accent-soft); overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.3s ease; }
+
+  .add-row {
+    display: flex; gap: 8px; margin: 20px 0; flex-wrap: wrap;
+  }
+  .add-row input[type="text"] {
+    flex: 1; min-width: 160px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-size: 14px;
+  }
+  .add-row input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .add-row button {
+    padding: 10px 16px; border-radius: 10px; border: none; background: var(--accent);
+    color: white; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .add-row button:hover { opacity: 0.9; }
+
+  .filters { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filters button {
+    padding: 6px 13px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface);
+    color: var(--text-dim); font-size: 13px; cursor: pointer; font-weight: 500;
+  }
+  .filters button.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+  .list { display: flex; flex-direction: column; gap: 8px; }
+  .item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 13px 14px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow);
+  }
+  .item-title { flex: 1; font-size: 14.5px; }
+  .item.done .item-title { color: var(--text-dim); text-decoration: line-through; }
+  .status-select {
+    font-size: 12.5px; font-weight: 600; padding: 5px 10px; border-radius: 999px; border: none;
+    cursor: pointer; appearance: none; text-align: center;
+  }
+  .status-toread { background: var(--accent-soft); color: var(--accent); }
+  .status-reading { background: var(--warn-soft); color: var(--warn); }
+  .status-done { background: var(--good-soft); color: var(--good); }
+  .remove-btn {
+    background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 16px;
+    line-height: 1; padding: 4px 6px; border-radius: 6px;
+  }
+  .remove-btn:hover { color: #d64545; background: var(--accent-soft); }
+
+  .empty { text-align: center; color: var(--text-dim); font-size: 14px; padding: 30px 0; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="index.html">← All pages</a>
+    <header>
+      <div class="eyebrow">Sample Page</div>
+      <h1>Reading List Tracker</h1>
+      <p class="sub">
+        An example of the kind of page that lives here — add books, mark progress, filter by status.
+        Your changes are saved in this browser, so they'll still be here next time you open this page.
+      </p>
+    </header>
+
+    <div class="progress-card">
+      <div class="progress-row">
+        <span><strong id="doneCount">0</strong> of <strong id="totalCount">0</strong> finished</span>
+        <span id="pct">0%</span>
+      </div>
+      <div class="bar"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="add-row">
+      <input type="text" id="titleInput" placeholder="Book title" />
+      <input type="text" id="authorInput" placeholder="Author (optional)" style="max-width:180px" />
+      <button id="addBtn">Add book</button>
+    </div>
+
+    <div class="filters" id="filters">
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="toread">To read</button>
+      <button data-filter="reading">Reading</button>
+      <button data-filter="done">Done</button>
+    </div>
+
+    <div class="list" id="list"></div>
+    <div class="empty" id="emptyState" style="display:none;">No books match this filter yet.</div>
+  </div>
+
+<script>
+(function () {
+  var STORAGE_KEY = "reading-list-tracker-v1";
+  var defaultBooks = [
+    { id: 1, title: "Atomic Habits", author: "James Clear", status: "done" },
+    { id: 2, title: "Deep Work", author: "Cal Newport", status: "reading" },
+    { id: 3, title: "The Pragmatic Programmer", author: "Hunt & Thomas", status: "toread" }
+  ];
+
+  var books = [];
+  var filter = "all";
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      books = raw ? JSON.parse(raw) : defaultBooks.slice();
+    } catch (e) {
+      books = defaultBooks.slice();
+    }
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(books)); } catch (e) {}
+  }
+
+  function statusLabel(s) {
+    return s === "toread" ? "To read" : s === "reading" ? "Reading" : "Done";
+  }
+
+  function render() {
+    var list = document.getElementById("list");
+    var empty = document.getElementById("emptyState");
+    list.innerHTML = "";
+
+    var visible = books.filter(function (b) { return filter === "all" || b.status === filter; });
+    empty.style.display = visible.length ? "none" : "block";
+
+    visible.forEach(function (b) {
+      var item = document.createElement("div");
+      item.className = "item" + (b.status === "done" ? " done" : "");
+
+      var title = document.createElement("span");
+      title.className = "item-title";
+      title.textContent = b.title + (b.author ? " — " + b.author : "");
+      item.appendChild(title);
+
+      var select = document.createElement("select");
+      select.className = "status-select status-" + b.status;
+      ["toread", "reading", "done"].forEach(function (s) {
+        var opt = document.createElement("option");
+        opt.value = s;
+        opt.textContent = statusLabel(s);
+        if (s === b.status) opt.selected = true;
+        select.appendChild(opt);
+      });
+      select.addEventListener("change", function () {
+        b.status = select.value;
+        save();
+        render();
+      });
+      item.appendChild(select);
+
+      var removeBtn = document.createElement("button");
+      removeBtn.className = "remove-btn";
+      removeBtn.textContent = "✕";
+      removeBtn.title = "Remove";
+      removeBtn.addEventListener("click", function () {
+        books = books.filter(function (x) { return x.id !== b.id; });
+        save();
+        render();
+      });
+      item.appendChild(removeBtn);
+
+      list.appendChild(item);
+    });
+
+    var total = books.length;
+    var done = books.filter(function (b) { return b.status === "done"; }).length;
+    var pct = total ? Math.round((done / total) * 100) : 0;
+    document.getElementById("totalCount").textContent = total;
+    document.getElementById("doneCount").textContent = done;
+    document.getElementById("pct").textContent = pct + "%";
+    document.getElementById("barFill").style.width = pct + "%";
+  }
+
+  document.getElementById("addBtn").addEventListener("click", function () {
+    var titleInput = document.getElementById("titleInput");
+    var authorInput = document.getElementById("authorInput");
+    var title = titleInput.value.trim();
+    if (!title) return;
+    books.push({ id: Date.now(), title: title, author: authorInput.value.trim(), status: "toread" });
+    titleInput.value = "";
+    authorInput.value = "";
+    save();
+    render();
+    titleInput.focus();
+  });
+
+  document.getElementById("titleInput").addEventListener("keydown", function (e) {
+    if (e.key === "Enter") document.getElementById("addBtn").click();
+  });
+
+  document.getElementById("filters").addEventListener("click", function (e) {
+    if (e.target.tagName !== "BUTTON") return;
+    filter = e.target.getAttribute("data-filter");
+    Array.prototype.forEach.call(document.querySelectorAll("#filters button"), function (btn) {
+      btn.classList.toggle("active", btn === e.target);
+    });
+    render();
+  });
+
+  load();
+  render();
+})();
+</script>
+</body>
+</html>
